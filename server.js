@@ -3,21 +3,39 @@ const app = express();
 app.use(express.json());
 
 const TokenBucket = require('./algorithms/tokenBucket');
-const limiter = new TokenBucket(10, 1); // capacity 10, refill 1 token/sec
+const limiter = new TokenBucket();
+
+const limitsConfig = require('./config/limits.json');
+
+function getClientLimits(clientId) {
+  return limitsConfig[clientId] || limitsConfig.default;
+}
 
 
 app.post('/check', (req, res) => {
   const { client_id } = req.body;
-  if (!client_id) return res.status(400).json({ error: 'client_id is required' });
 
-  const chosen = algorithm === 'sliding_window' ? slidingLimiter : limiter;
-
-  const result = chosen.allow(client_id);
-  if (result.allowed) {
-    return res.json({ allowed: true, remaining: result.remaining });
+  if (!client_id) {
+    return res.status(400).json({ error: 'client_id is required' });
   }
+
+  const config = getClientLimits(client_id);
+
+  const result = limiter.allow(client_id, config);
+
+  if (result.allowed) {
+    return res.json({
+      allowed: true,
+      remaining: result.remaining
+    });
+  }
+
   res.set('Retry-After', String(result.retryAfterSeconds));
-  return res.status(429).json({ allowed: false, retry_after_seconds: result.retryAfterSeconds });
+
+  return res.status(429).json({
+    allowed: false,
+    retry_after_seconds: result.retryAfterSeconds
+  });
 });
 
 

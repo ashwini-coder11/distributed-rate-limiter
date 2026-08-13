@@ -1,0 +1,14 @@
+{
+     "default": {
+          "capacity": 10,
+          "refillRatePerSecond": 1
+     },
+     "api_key_123": {
+          "capacity": 10,
+          "refillRatePerSecond": 1
+     },
+     "api_key_premium": {
+          "capacity": 100,
+          "refillRatePerSecond": 10
+     }
+}
