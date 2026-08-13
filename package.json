@@ -1,0 +1,32 @@
+{
+  "name": "distributed-rate-limiter",
+  "version": "1.0.0",
+  "description": "A distributed rate limiter using token bucket and sliding  window algorithms, backed by Redis for cross-instance consistency. project setup started",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+     "test": "jest"
+     
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ashwini-coder11/distributed-rate-limiter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ashwini-coder11/distributed-rate-limiter/issues"
+  },
+  "homepage": "https://github.com/ashwini-coder11/distributed-rate-limiter#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
+  }
+}
