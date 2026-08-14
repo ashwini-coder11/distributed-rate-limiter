@@ -1,30 +1,32 @@
 class TokenBucket {
-     constructor() {
+     constructor(capacity, refillRatePerSecond) {
+          this.capacity = capacity;
+          this.refillRatePerSecond = refillRatePerSecond;
           this.buckets = new Map(); // client_id -> { tokens, lastRefill }
      }
 
-     _refill(bucket, config) {
+     _refill(bucket) {
           const now = Date.now();
           const elapsedSeconds = (now - bucket.lastRefill) / 1000;
-          const tokensToAdd = elapsedSeconds * config.refillRatePerSecond;
-          bucket.tokens = Math.min(config.capacity, bucket.tokens + tokensToAdd);
+          const tokensToAdd = elapsedSeconds * this.refillRatePerSecond;
+          bucket.tokens = Math.min(this.capacity, bucket.tokens + tokensToAdd);
           bucket.lastRefill = now;
      }
 
-     allow(clientId, config) {
+     allow(clientId) {
           if (!this.buckets.has(clientId)) {
-               this.buckets.set(clientId, { tokens: config.capacity, lastRefill: Date.now() });
+               this.buckets.set(clientId, { tokens: this.capacity, lastRefill: Date.now() });
           }
 
           const bucket = this.buckets.get(clientId);
-          this._refill(bucket, config);
+          this._refill(bucket);
 
           if (bucket.tokens >= 1) {
                bucket.tokens -= 1;
                return { allowed: true, remaining: Math.floor(bucket.tokens) };
           }
 
-          const secondsToNextToken = (1 - bucket.tokens) / config.refillRatePerSecond;
+          const secondsToNextToken = (1 - bucket.tokens) / this.refillRatePerSecond;
           return { allowed: false, retryAfterSeconds: Math.ceil(secondsToNextToken) };
      }
 }
