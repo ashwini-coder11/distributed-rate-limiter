@@ -1,3 +1,8 @@
+// const redis = require('./redis/client');
+// redis.set('test_key', 'hello')
+//   .then(() => redis.get('test_key'))
+//   .then((val) => console.log('Redis round-trip:', val));
+
 const express = require('express');
 const app = express();
 app.use(express.json());
