@@ -1,0 +1,195 @@
+k6 Load Testing Results
+=======================
+
+Test Configuration
+------------------
+Endpoint: POST http://localhost:3000/check
+Test tool: k6
+Load pattern:
+- Ramp up for 10 seconds
+- Hold target VUs for 30 seconds
+- Ramp down for 10 seconds
+
+Each virtual user sends:
+
+{
+  "client_id": "load_test_client_<VU_ID>",
+  "action": "search_api"
+}
+
+A 100ms sleep is used between requests.
+
+Expected responses:
+- 200: Request allowed
+- 429: Rate limit exceeded
+
+Check:
+status is 200 or 429
+
+
+==================================================
+50 VIRTUAL USERS
+==================================================
+
+Total Requests:
+18564
+
+Requests per Second:
+370.959965/s
+
+HTTP Request Duration:
+Average: 7.73ms
+Minimum: 489µs
+Median: 6.56ms
+Maximum: 60.29ms
+p90: 14.58ms
+p95: 16.97ms
+p99: 20.41ms
+
+Checks:
+Total: 18564
+Succeeded: 100.00% (18564 out of 18564)
+Failed: 0.00% (0 out of 18564)
+
+Result:
+The rate limiter handled approximately 371 requests per second
+with a p99 latency of 20.41ms.
+
+
+==================================================
+100 VIRTUAL USERS
+==================================================
+
+Total Requests:
+37505
+
+Requests per Second:
+749.07139/s
+
+HTTP Request Duration:
+Average: 6.54ms
+Minimum: 410µs
+Median: 5.04ms
+Maximum: 56.67ms
+p90: 13.98ms
+p95: 17.5ms
+p99: 23.08ms
+
+Checks:
+Total: 37505
+Succeeded: 100.00% (37505 out of 37505)
+Failed: 0.00% (0 out of 37505)
+
+Result:
+The rate limiter handled approximately 749 requests per second
+with a p99 latency of 23.08ms.
+
+
+==================================================
+200 VIRTUAL USERS
+==================================================
+
+Total Requests:
+74481
+
+Requests per Second:
+1487.976292/s
+
+HTTP Request Duration:
+Average: 7.11ms
+Minimum: 391µs
+Median: 3.7ms
+Maximum: 122.73ms
+p90: 15.28ms
+p95: 26.62ms
+p99: 60.48ms
+
+Checks:
+Total: 74481
+Succeeded: 100.00% (74481 out of 74481)
+Failed: 0.00% (0 out of 74481)
+
+Result:
+The rate limiter handled approximately 1,488 requests per second
+with a p99 latency of 60.48ms.
+
+
+==================================================
+400 VIRTUAL USERS
+==================================================
+
+Total Requests:
+134424
+
+Requests per Second:
+2685.953109/s
+
+HTTP Request Duration:
+Average: 19.03ms
+Minimum: 423µs
+Median: 14.4ms
+Maximum: 143.2ms
+p90: 41.07ms
+p95: 54.12ms
+p99: 89.89ms
+
+Checks:
+Total: 134424
+Succeeded: 100.00% (134424 out of 134424)
+Failed: 0.00% (0 out of 134424)
+
+Result:
+The rate limiter handled approximately 2,686 requests per second
+with a p99 latency of 89.89ms.
+
+
+==================================================
+PERFORMANCE COMPARISON
+==================================================
+
+Virtual Users | Total Requests | Requests/sec | Avg Latency | p95 Latency | p99 Latency | Checks Passed
+----------------------------------------------------------------------------------------------------------
+50            | 18,564         | 370.96       | 7.73ms      | 16.97ms     | 20.41ms     | 100%
+100           | 37,505         | 749.07       | 6.54ms      | 17.50ms     | 23.08ms     | 100%
+200           | 74,481         | 1,487.98     | 7.11ms      | 26.62ms     | 60.48ms     | 100%
+400           | 134,424        | 2,685.95     | 19.03ms     | 54.12ms     | 89.89ms     | 100%
+
+
+==================================================
+SUMMARY
+==================================================
+
+The distributed rate limiter was tested using k6 with workloads
+ranging from 50 to 400 concurrent virtual users.
+
+Throughput increased as concurrency increased:
+
+50 VUs  -> approximately 371 requests/sec
+100 VUs -> approximately 749 requests/sec
+200 VUs -> approximately 1,488 requests/sec
+400 VUs -> approximately 2,686 requests/sec
+
+All k6 checks passed successfully across every test:
+
+50 VUs:  100% checks passed
+100 VUs: 100% checks passed
+200 VUs: 100% checks passed
+400 VUs: 100% checks passed
+
+Tail latency remained relatively low at 50 and 100 VUs, with
+p99 latencies of 20.41ms and 23.08ms respectively.
+
+At higher concurrency, p99 latency increased:
+
+200 VUs -> 60.48ms
+400 VUs -> 89.89ms
+
+The highest tested throughput was approximately 2,686 requests per
+second at 400 virtual users, with a p99 latency of 89.89ms.
+
+The 100 VU test provided the best balance between throughput and
+tail latency:
+
+Approximately 749 requests/sec
+p99 latency: 23.08ms
+100% checks passed
