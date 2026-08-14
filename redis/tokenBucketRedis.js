@@ -9,9 +9,12 @@ async function checkTokenBucket(clientId, capacity, refillRate) {
      const now = Date.now();
      const result = await redis.eval(script, 1, key, capacity, refillRate, now);
      const [allowed, remainingTokens] = result;
+     const isAllowed = allowed === 1;
+     const remainingTokensFloat = parseFloat(remainingTokens);
      return {
-          allowed: allowed === 1,
-          remaining: Math.floor(parseFloat(remainingTokens)),
+          allowed: isAllowed,
+          remaining: Math.floor(remainingTokensFloat),
+          retryAfterSeconds: isAllowed ? 0 : Math.ceil((1 - remainingTokensFloat) / refillRate),
      };
 }
 

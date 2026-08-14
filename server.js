@@ -1,9 +1,5 @@
-// const redis = require('./redis/client');
-// redis.set('test_key', 'hello')
-//   .then(() => redis.get('test_key'))
-//   .then((val) => console.log('Redis round-trip:', val));
-
 const express = require('express');
+const redis = require('./redis/client');
 const app = express();
 app.use(express.json());
 
@@ -22,7 +18,12 @@ app.post('/check', async (req, res) => {
   const { capacity, refillRatePerSecond } = getClientLimits(client_id);
   const result = await checkTokenBucket(client_id, capacity, refillRatePerSecond);
 
-  if (result.allowed) return res.json({ allowed: true, remaining: result.remaining });
+  if (result.allowed) {
+    await redis.incr(`ratelimit:stats:${client_id}:allowed`);
+    return res.json({ allowed: true, remaining: result.remaining });
+  }
+  
+  await redis.incr(`ratelimit:stats:${client_id}:rejected`);
   res.set('Retry-After', String(result.retryAfterSeconds));
   return res.status(429).json({
     allowed: false,
@@ -30,7 +31,23 @@ app.post('/check', async (req, res) => {
   });
 });
 
-
-app.listen(3000, () => {
-  console.log('Rate limiter server running on http://localhost:3000');
+app.get('/stats/:client_id', async (req, res) => {
+  const { client_id } = req.params;
+  const allowed = await redis.get(`ratelimit:stats:${client_id}:allowed`) || '0';
+  const rejected = await redis.get(`ratelimit:stats:${client_id}:rejected`) || '0';
+  
+  res.json({
+    client_id,
+    allowed: parseInt(allowed, 10),
+    rejected: parseInt(rejected, 10)
+  });
 });
+
+
+if (require.main === module) {
+  app.listen(3000, () => {
+    console.log('Rate limiter server running on http://localhost:3000');
+  });
+}
+
+module.exports = app;
