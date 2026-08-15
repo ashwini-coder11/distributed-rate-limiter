@@ -37,7 +37,7 @@ done
 wait
 ```
 
-With a bucket capacity of 10, 15 simultaneous requests produced exactly 10 `200`s and 5 `429`s — even though they all hit the server at essentially the same instant. Full output: [`loadtest/manual_burst_test.txt`](./loadtest/manual_burst_test.txt).
+With a bucket capacity of 10, 15 simultaneous requests produced exactly 10 `200`s and 5 `429`s — even though they all hit the server at essentially the same instant. Full output: [`loadtest/result.txt`](./loadtest/result.txt).
 
 Rejected requests look like this:
 ```json
