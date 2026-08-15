@@ -3,6 +3,14 @@ const redis = require('./redis/client');
 const app = express();
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Distributed Rate Limiter API',
+    usage: 'POST /check with body { "client_id": "your_id" }',
+    docs: 'https://github.com/ashwini-coder11/distributed-rate-limiter'
+  });
+});
+
 const limitsConfig = require('./config/limits.json');
 
 function getClientLimits(clientId) {
