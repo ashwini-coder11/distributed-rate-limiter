@@ -22,7 +22,7 @@ app.post('/check', async (req, res) => {
     await redis.incr(`ratelimit:stats:${client_id}:allowed`);
     return res.json({ allowed: true, remaining: result.remaining });
   }
-  
+
   await redis.incr(`ratelimit:stats:${client_id}:rejected`);
   res.set('Retry-After', String(result.retryAfterSeconds));
   return res.status(429).json({
@@ -35,7 +35,6 @@ app.get('/stats/:client_id', async (req, res) => {
   const { client_id } = req.params;
   const allowed = await redis.get(`ratelimit:stats:${client_id}:allowed`) || '0';
   const rejected = await redis.get(`ratelimit:stats:${client_id}:rejected`) || '0';
-  
   res.json({
     client_id,
     allowed: parseInt(allowed, 10),
@@ -45,8 +44,8 @@ app.get('/stats/:client_id', async (req, res) => {
 
 
 if (require.main === module) {
-  app.listen(3000, () => {
-    console.log('Rate limiter server running on http://localhost:3000');
+  app.listen(process.env.PORT || 3000, () => {
+    console.log(`Rate limiter server running on port ${process.env.PORT || 3000}`);
   });
 }
 
